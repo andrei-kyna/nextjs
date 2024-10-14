@@ -142,9 +142,9 @@ function convertDateToLocal(utcDateString) {
               {dailySummary ? (
                 <TableRow>
                   <TableCell>{dailySummary.fullName}</TableCell>
-                  <TableCell>{dailySummary.date}</TableCell>
+                  <TableCell>{(convertDateToLocal)}{dailySummary.date}</TableCell>
                   <TableCell>{dailySummary.totalTime}</TableCell>
-                  <TableCell>{dailySummary.timeSpan}</TableCell>
+                  <TableCell>{(convertTimeSpanToLocal)}{dailySummary.timeSpan}</TableCell>
                 </TableRow>
               ) : (
                 <TableRow>

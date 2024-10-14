@@ -8,7 +8,7 @@ import { Poppins } from 'next/font/google';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import NavBar from '@/components/ui/navBar';  
-import { Link } from 'lucide-react';
+import Link from 'next/link';
 
 const poppins = Poppins({
   subsets: ['latin'],
