@@ -33,10 +33,25 @@ export default async function handler(req, res) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
+      const latestEntry = await prisma.timesheet.findFirst({
+        where: {
+          employeeID: employeeId,
+          time: {
+            gte: today,
+            lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+        },
+        orderBy: { time: 'desc' },
+      });
+
       let newEntry;
 
       // Handle different action types (TIME_IN, BREAK, TIME_OUT)
       if (action === 'TIME_IN') {
+        if (latestEntry && latestEntry.type === 'TIME_OUT') {
+          return res.status(400).json({ message: 'You cannot Time In after Time Out for today' });
+        }
+
         // Create a TIME_IN entry
         newEntry = await prisma.timesheet.create({
           data: {
@@ -58,6 +73,10 @@ export default async function handler(req, res) {
         });
 
       } else if (action === 'BREAK') {
+        if (!latestEntry || latestEntry.type !== 'TIME_IN') {
+          return res.status(400).json({ message: 'You must Time In before taking a Break' });
+        }
+
         // Create a BREAK entry
         newEntry = await prisma.timesheet.create({
           data: {
@@ -71,6 +90,10 @@ export default async function handler(req, res) {
         await calculateTotalTime(employeeId, today, currentTime, 'BREAK');
 
       } else if (action === 'TIME_OUT') {
+        if (!latestEntry || latestEntry.type !== 'TIME_IN') {
+          return res.status(400).json({ message: 'You must Time In before Time Out' });
+        }
+        
         // Create a TIME_OUT entry
         newEntry = await prisma.timesheet.create({
           data: {
