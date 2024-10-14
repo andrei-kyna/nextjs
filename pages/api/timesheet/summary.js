@@ -17,14 +17,14 @@ function formatTimeInHHMMSS(totalTimeInSeconds) {
 // Helper function to format date in a user-friendly format
 function formatDateForDisplay(date) {
   return new Date(date).toLocaleDateString('en-US', {
-    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC',
   });
 }
 
 // Helper function to format time in a user-friendly format
 function formatTimeForDisplay(date) {
   return new Date(date).toLocaleTimeString('en-US', {
-    hour: '2-digit', minute: '2-digit'
+    hour: '2-digit', minute: '2-digit', timeZone: 'UTC',
   });
 }
 
@@ -60,13 +60,13 @@ async function getDailySummaryForToday(employeeId) {
 
 // Helper function to fetch timesheet entries for today
 async function getTimesheetEntriesForToday(employeeId) {
-  const today = getStartOfToday();
+  const todayUTC = getStartOfToday();
   return prisma.timesheet.findMany({
     where: {
       employeeID: employeeId,
       time: {
-        gte: today, // From the start of today
-        lt: new Date(today.getTime() + 24 * 60 * 60 * 1000), // Until the end of today
+        gte: todayUTC, // From the start of today
+        lt: new Date(todayUTC.getTime() + 24 * 60 * 60 * 1000), // Until the end of today
       },
     },
     orderBy: { time: 'asc' }, // Order by time ascending

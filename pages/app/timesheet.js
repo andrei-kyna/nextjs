@@ -31,6 +31,31 @@ export default function Timesheet() {
     fetchTimesheetData();
   }, [session, fetchTimesheetData]); // You no longer need fetchTimesheetData here as a dependency
 
+  // Convert UTC time span string (e.g., "04:34 AM to 04:35 AM") to local time
+function convertTimeSpanToLocal(timeSpan) {
+  // Split the timeSpan into two parts (start and end times)
+  const [startTimeUTC, endTimeUTC] = timeSpan.split(' to ');
+
+  // Convert start time from UTC to the user's local time
+  const localStartTime = new Date(`1970-01-01T${convertTo24HourFormat(startTimeUTC)}Z`).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  // If there's no end time, return only the start time
+  if (!endTimeUTC) {
+    return localStartTime; // Return only the local start time
+  }
+
+  // Convert end time from UTC to the user's local time
+  const localEndTime = new Date(`1970-01-01T${convertTo24HourFormat(endTimeUTC)}Z`).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  // Return the local time span as a string (start to end)
+  return `${localStartTime} to ${localEndTime}`;
+}
   const convertTo24HourFormat = (timeString) => {
     if (!timeString || !timeString.includes(' ')) {
       console.error("Invalid time format:", timeString);
@@ -48,6 +73,14 @@ export default function Timesheet() {
 
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
   };
+
+// Convert UTC date string (e.g., "Mon, Oct 14, 2024") to local date
+function convertDateToLocal(utcDateString) {
+  const utcDate = new Date(utcDateString + ' UTC'); // Add 'UTC' to parse correctly
+  return utcDate.toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+  });
+}
 
   const formik = useFormik({
     initialValues: {
