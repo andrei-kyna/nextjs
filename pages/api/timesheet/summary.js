@@ -17,21 +17,21 @@ function formatTimeInHHMMSS(totalTimeInSeconds) {
 // Helper function to format date in a user-friendly format
 function formatDateForDisplay(date) {
   return new Date(date).toLocaleDateString('en-US', {
-    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC',
+    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'Asia/Manila', // Set timezone to GMT+8
   });
 }
 
 // Helper function to format time in a user-friendly format
 function formatTimeForDisplay(date) {
   return new Date(date).toLocaleTimeString('en-US', {
-    hour: '2-digit', minute: '2-digit', timeZone: 'UTC',
+    hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Manila', // Set timezone to GMT+8
   });
 }
 
 // Helper function to get the start of today (midnight)
 function getStartOfToday() {
   const today = new Date();
-  today.setUTCHours(0, 0, 0, 0); // Midnight of today
+  today.setHours(0, 0, 0, 0); // Midnight of today
   return today;
 }
 

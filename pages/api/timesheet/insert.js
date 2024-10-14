@@ -105,65 +105,50 @@ export default async function handler(req, res) {
 
         // Calculate the total time for the entire day
         await calculateTotalTime(employeeId, today, currentTime, 'TIME_OUT');
-      } else {
-        return res.status(400).json({ message: 'Invalid action' });
       }
 
-      return res.status(201).json({ message: `${action} logged`, timesheet: newEntry });
+      return res.status(200).json({ message: 'Success', newEntry });
     } catch (error) {
-      console.error('Error logging timesheet:', error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      console.error('Error inserting timesheet entry:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   } else {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return res.status(405).json({ message: 'Method not allowed' });
   }
 }
 
-// Helper function to calculate total time and update daily summary
-async function calculateTotalTime(employeeId, today, currentTime, actionType) {
-  try {
-    // Fetch all timesheet entries for today
-    const timesheetEntries = await prisma.timesheet.findMany({
-      where: {
-        employeeID: employeeId,
-        time: {
-          gte: today,  // Get entries from the start of today
-          lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),  // Until the end of today
-        },
+// Function to calculate total time for the day
+async function calculateTotalTime(employeeId, today, currentTime, action) {
+  const timeEntries = await prisma.timesheet.findMany({
+    where: {
+      employeeID: employeeId,
+      time: {
+        gte: today,
+        lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
       },
-      orderBy: { time: 'asc' },  // Order by time ascending
-    });
+    },
+    orderBy: { time: 'asc' },
+  });
 
-    let totalTime = 0;
-    let lastTimeIn = null;
+  let totalTime = 0;
 
-    // Loop through timesheet entries and calculate totalTime
-    timesheetEntries.forEach((entry) => {
-      if (entry.type === 'TIME_IN') {
-        lastTimeIn = new Date(entry.time);
-      } else if (lastTimeIn && (entry.type === 'BREAK' || entry.type === 'TIME_OUT')) {
-        totalTime += (new Date(entry.time) - lastTimeIn) / 1000;  // Calculate duration in seconds
-        lastTimeIn = null;  // Reset after calculating duration
-      }
-    });
+  // Calculate the total time between the entries
+  for (let i = 0; i < timeEntries.length - 1; i++) {
+    const entryTime = timeEntries[i].time;
+    const nextEntryTime = timeEntries[i + 1].time;
 
-    // Upsert daily summary with updated total time
-    await prisma.dailySummary.upsert({
-      where: { employeeId_date: { employeeId, date: today } },
-      update: {
-        totalTime: totalTime,  // Update totalTime in seconds
-      },
-      create: {
-        employeeId,
-        date: today,
-        totalTime: totalTime,  // If no record exists, create one with the calculated totalTime
-      },
-    });
-
-    return totalTime;
-  } 
-  catch (error) {
-    console.error(`Error calculating total time for ${actionType}:`, error);
-    throw new Error('Error calculating total time');
+    if (timeEntries[i].type === 'TIME_IN' && timeEntries[i + 1].type === 'TIME_OUT') {
+      totalTime += (nextEntryTime - entryTime) / 1000; // Add time difference in seconds
+    }
   }
+
+  // Update the daily summary with the total time
+  await prisma.dailySummary.update({
+    where: {
+      employeeId_date: { employeeId, date: today },
+    },
+    data: {
+      totalTime,
+    },
+  });
 }

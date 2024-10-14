@@ -37,7 +37,7 @@ function convertTimeSpanToLocal(timeSpan) {
   const [startTimeUTC, endTimeUTC] = timeSpan.split(' to ');
 
   // Convert start time from UTC to the user's local time
-  const localStartTime = new Date(`1970-01-01T${convertTo24HourFormat(startTimeUTC)}Z`).toLocaleTimeString('en-US', {
+  const localStartTime = new Date(`1970-01-01T${convertTo24HourFormat(startTimeUTC)}+8:00`).toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -48,7 +48,7 @@ function convertTimeSpanToLocal(timeSpan) {
   }
 
   // Convert end time from UTC to the user's local time
-  const localEndTime = new Date(`1970-01-01T${convertTo24HourFormat(endTimeUTC)}Z`).toLocaleTimeString('en-US', {
+  const localEndTime = new Date(`1970-01-01T${convertTo24HourFormat(endTimeUTC)}+8:00`).toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -76,7 +76,7 @@ function convertTimeSpanToLocal(timeSpan) {
 
 // Convert UTC date string (e.g., "Mon, Oct 14, 2024") to local date
 function convertDateToLocal(utcDateString) {
-  const utcDate = new Date(utcDateString + ' UTC'); // Add 'UTC' to parse correctly
+  const utcDate = new Date(utcDateString + 'T00:00:00+08:00'); // Add 'UTC' to parse correctly
   return utcDate.toLocaleDateString('en-US', {
     weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
   });
