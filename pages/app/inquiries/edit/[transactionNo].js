@@ -193,11 +193,11 @@ export default function EditInquiry() {
                     <div>
                         <Select onValueChange={(value) => formik.setFieldValue("status", value)} value={formik.values.status}>
                             <SelectTrigger className="rounded bg-[#444] text-[#fff]">
-                                <SelectValue placeholder="Select Status" />
+                                <SelectValue placeholder="Select Status" className="text-white"/>
                             </SelectTrigger>
                             <SelectContent className="bg-[#222] rounded">
-                                <SelectItem className="hover:bg-[#333]" value="Pending">Pending</SelectItem>
-                                <SelectItem value="Read">Read</SelectItem>
+                                <SelectItem className="hover:bg-[#333] text-white" value="Pending">Pending</SelectItem>
+                                <SelectItem className="hover:bg-[#333] text-white" value="Read">Read</SelectItem>
                             </SelectContent>
                         </Select>
                         {formik.touched.status && formik.errors.status && (
