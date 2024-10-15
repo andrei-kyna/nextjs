@@ -135,7 +135,7 @@ function convertDateToLocal(utcDateString) {
           </p>
         ) : lastAction === 'BREAK' ? (
           <p className={`${poppins.className} text-xl text-white`}>
-            You've worked for <b>{dailySummary.totalTime}</b> so far. Ready to resume?
+            You have worked for <b>{dailySummary.totalTime}</b> so far. Ready to resume?
           </p>
         ) : lastAction === 'TIME_IN' ? (
           <p className={`${poppins.className} text-xl text-white`}>
