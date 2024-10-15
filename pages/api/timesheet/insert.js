@@ -131,24 +131,33 @@ async function calculateTotalTime(employeeId, today, currentTime, action) {
   });
 
   let totalTime = 0;
+  let lastTimeIn = null;
 
-  // Calculate the total time between the entries
-  for (let i = 0; i < timeEntries.length - 1; i++) {
-    const entryTime = timeEntries[i].time;
-    const nextEntryTime = timeEntries[i + 1].time;
+  // Calculate the total time between TIME_IN and BREAK
+  for (let i = 0; i < timeEntries.length; i++) {
+    const entryTime = new Date(timeEntries[i].time);
 
-    if (timeEntries[i].type === 'TIME_IN' && timeEntries[i + 1].type === 'TIME_OUT') {
-      totalTime += (nextEntryTime - entryTime) / 1000; // Add time difference in seconds
+    if (timeEntries[i].type === 'TIME_IN') {
+      lastTimeIn = entryTime; // Store the time of TIME_IN
+    } else if (lastTimeIn && (timeEntries[i].type === 'BREAK' || timeEntries[i].type === 'TIME_OUT')) {
+      // If we have a TIME_IN and encounter BREAK or TIME_OUT, calculate the duration
+      totalTime += (entryTime - lastTimeIn) / 1000; // Add time difference in seconds
+      lastTimeIn = null; // Reset lastTimeIn after calculating
     }
   }
 
   // Update the daily summary with the total time
-  await prisma.dailySummary.update({
-    where: {
-      employeeId_date: { employeeId, date: today },
+  await prisma.dailySummary.upsert({
+    where: { employeeId_date: { employeeId, date: today } },
+    update: {
+      totalTime, // Update total time
     },
-    data: {
-      totalTime,
+    create: {
+      employeeId,
+      date: today,
+      totalTime, // Create new daily summary with total time
     },
   });
+
+  return totalTime; // Optionally return the total time calculated
 }

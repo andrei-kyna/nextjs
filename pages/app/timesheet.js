@@ -128,6 +128,24 @@ function convertDateToLocal(utcDateString) {
     <div className='flex flex-col items-center gap-10 bg-[#111] text-white min-h-screen w-full' style={{ height: '770px', width: '1370px' }}>
       <h1 className={`${poppins.className} mt-10 text-center text-[3rem] font-[900] uppercase`}>Daily Timesheet</h1>
 
+    {/* Status Message */}
+    {lastAction === 'TIME_OUT' ? (
+          <p className={`${poppins.className} text-xl text-white`}>
+            You have logged a total of <b>{dailySummary.totalTime}</b> hours today.
+          </p>
+        ) : lastAction === 'BREAK' ? (
+          <p className={`${poppins.className} text-xl text-white`}>
+            You've worked for <b>{dailySummary.totalTime}</b> so far. Ready to resume?
+          </p>
+        ) : lastAction === 'TIME_IN' ? (
+          <p className={`${poppins.className} text-xl text-white`}>
+            Your timer is active. Click <b>Break</b> to pause or <b>Time Out</b> to stop.
+          </p>
+        ) : (
+          <p className={`${poppins.className} text-xl text-white`}>
+            Click <b>Time In</b> to start tracking your work hours.
+          </p>
+        )}
       <div className='flex flex-col gap-3 mt-10'>
         <h1 className={`${poppins.className} ml-5 text-[var(--white)] text-[1.5rem] font-[900] uppercase`}>Summary:</h1>
         <div className="container mb-10 bg-[var(--dark)] p-5 rounded-ss-xl rounded-ee-xl border-[var(--ten-opacity-white)] border-[1px]">
