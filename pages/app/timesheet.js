@@ -16,6 +16,11 @@ export default function Timesheet() {
   const [dailySummary, setDailySummary] = useState(null); 
   const [loading, setLoading] = useState(true); 
 
+  // Individual loading states for each button
+  const [isTimeInLoading, setIsTimeInLoading] = useState(false);
+  const [isBreakLoading, setIsBreakLoading] = useState(false);
+  const [isTimeOutLoading, setIsTimeOutLoading] = useState(false);
+
   // Memoize fetchTimesheetData using useCallback
   const fetchTimesheetData = useCallback(async () => {
     if (session) {
@@ -186,12 +191,14 @@ function convertDateToLocal(utcDateString) {
           type="button"
           className="min-w-28 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
           onClick={async () => {
+            setIsTimeInLoading(true);
             await formik.setFieldValue('action', 'TIME_IN');
-            formik.submitForm();
+            await formik.submitForm();
+            setIsTimeInLoading(false);
           }}
-          disabled={!isInitialState && isTimeInDisabled} 
+          disabled={isTimeInLoading || (!isInitialState && isTimeInDisabled)} 
         >
-          Time In
+          {isTimeInLoading ? 'Processing...' : 'Time In'}
         </Button>
 
         <Button
@@ -199,12 +206,14 @@ function convertDateToLocal(utcDateString) {
           type="button"
           className="min-w-28 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
           onClick={async () => {
+            setIsBreakLoading(true);
             await formik.setFieldValue('action', 'BREAK');
-            formik.submitForm();
+            await formik.submitForm();
+            setIsBreakLoading(false);
           }}
-          disabled={isBreakDisabled} 
+          disabled={isBreakLoading || isBreakDisabled} 
         >
-          Break
+          {isBreakLoading ? 'Processing...' : 'Break'}
         </Button>
 
         <Button
@@ -212,12 +221,14 @@ function convertDateToLocal(utcDateString) {
           type="button"
           className="min-w-28 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
           onClick={async () => {
+            setIsTimeOutLoading(true);
             await formik.setFieldValue('action', 'TIME_OUT');
-            formik.submitForm();
+            await formik.submitForm();
+            setIsTimeOutLoading(false);
           }}
-          disabled={isTimeOutDisabled} 
+          disabled={isTimeOutLoading || isTimeOutDisabled} 
         >
-          Time Out
+          {isTimeOutLoading ? 'Processing...' : 'Time Out'}
         </Button>
       </form>
     </div>
