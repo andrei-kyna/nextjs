@@ -25,6 +25,17 @@ export const loginFormSchema = Yup.object({
   password: Yup.string().required('Password is required'),
 });
 
-
+export const employeePayrateFormSchema = Yup.object({
+  payRate: Yup.number()
+    .typeError('Pay rate must be a number')
+    .positive('Pay rate must be a positive number')
+    .required('Pay rate is required'),
+  payRateSchedule: Yup.string()
+    .oneOf(['Hourly', 'Daily'], 'Invalid pay rate schedule selected')
+    .required('Pay rate schedule is required'),
+  effectiveDate: Yup.date()
+    .required('Effective date is required')
+    .typeError('Effective date is required')
+});
 
 

@@ -3,7 +3,7 @@ import NavBar from '@/components/ui/navBar';
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '900'],
+  weight: ['300', '400'],
 });
 
 export default function About() {

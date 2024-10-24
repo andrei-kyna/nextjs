@@ -46,6 +46,9 @@ export default function NavBar() {
         {session ? (
           <>
             <li style={liStyles}>
+              <Link href={routes.employee} style={linkStyles}>Employee</Link>
+            </li>
+            <li style={liStyles}>
               <Link href={routes.timesheet} style={linkStyles}>Timesheet</Link>
             </li>
             <li style={liStyles}>
