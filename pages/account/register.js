@@ -12,7 +12,7 @@ import Link from 'next/link';
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '900'],
+  weight: ['400', '300'],
 });
 
 export default function Register() {
@@ -75,10 +75,10 @@ export default function Register() {
 
   // Styles
   const pageStyles = {
-    backgroundColor: '#111', // Background color
+    backgroundColor: '#fff', // Background color
     width: '225vh',
     minHeight: '100vh',
-    color: '#fff',
+    color: '#000',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -86,12 +86,12 @@ export default function Register() {
   };
 
   const formStyles = {
-    backgroundColor: '#222', // Form background color
+    backgroundColor: '#fff', // Form background color
     minWidth: '35rem',
     maxWidth: '35rem',
     padding: '2rem',
     borderRadius: '12px',
-    border: '1px solid rgba(255, 255, 255, 0.1)', // Border color
+    border: '1px solid black', // Border color
     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)', // Shadow for depth
   };
 
@@ -99,12 +99,12 @@ export default function Register() {
     <div style={pageStyles}>
       <NavBar />
       <div style={formStyles} className="space-y-4">
-        <h1 className={`${poppins.className} text-center text-[3rem] font-[900] uppercase`}>Registration</h1>
+        <h1 className={`${poppins.className} text-center text-black text-[3rem] font-[900] uppercase`}>Registration</h1>
         <form onSubmit={formik.handleSubmit}>
-          <p className="text-center">Already have an account? <Link href="/account/login" className="text-[var(--starred)] hover:underline">Login</Link></p>
+          <p className="text-center text-black">Already have an account? <Link href="/account/login" className="text-black hover:underline">Login</Link></p>
 
           {/* First Name Input */}
-          <div>
+          <div className="mb-4">
             <Input
               id="firstName"
               name="firstName"
@@ -113,7 +113,7 @@ export default function Register() {
               onBlur={formik.handleBlur}
               value={formik.values.firstName}
               placeholder="First Name"
-              className="rounded focus-visible:ring-2 focus-visible:ring-[var(--twentyfive-opacity-white)]"
+              className="rounded focus-visible:ring-2 focus-visible:ring-[var(--twentyfive-opacity-white) p-2]"
             />
             {formik.touched.firstName && formik.errors.firstName && (
               <p className="text-red-500">{formik.errors.firstName}</p>
@@ -121,7 +121,7 @@ export default function Register() {
           </div>
 
           {/* Last Name Input */}
-          <div>
+          <div className="mb-4">
             <Input
               id="lastName"
               name="lastName"
@@ -130,7 +130,7 @@ export default function Register() {
               onBlur={formik.handleBlur}
               value={formik.values.lastName}
               placeholder="Last Name"
-              className="rounded focus-visible:ring-2 focus-visible:ring-[var(--twentyfive-opacity-white)]"
+              className="rounded focus-visible:ring-2 focus-visible:ring-[var(--twentyfive-opacity-white) p-2]"
             />
             {formik.touched.lastName && formik.errors.lastName && (
               <p className="text-red-500">{formik.errors.lastName}</p>
@@ -138,15 +138,15 @@ export default function Register() {
           </div>
 
           {/* Gender Select Input */}
-          <div>
+          <div className="mb-4">
             <Select onValueChange={(value) => formik.setFieldValue("gender", value)} value={formik.values.gender}>
               <SelectTrigger className="rounded focus-visible:ring-2 focus-visible:ring-[var(--twentyfive-opacity-white)]">
                 <SelectValue placeholder="Select Gender" />
               </SelectTrigger>
-              <SelectContent className="bg-[var(--dark)] rounded">
-                <SelectItem className="hover:bg-[var(--dark-grey)] text-white" value="MALE">Male</SelectItem>
-                <SelectItem className="hover:bg-[var(--dark-grey) text-white" value="FEMALE">Female</SelectItem>
-                <SelectItem className="hover:bg-[var(--dark-grey)] text-white" value="OTHER">Other</SelectItem>
+              <SelectContent className="bg-[#fff]  rounded">
+                <SelectItem className="hover:bg-[#444] text-black" value="MALE">Male</SelectItem>
+                <SelectItem className="hover:bg-[#444] text-black" value="FEMALE">Female</SelectItem>
+                <SelectItem className="hover:bg-[#444] text-black" value="OTHER">Other</SelectItem>
               </SelectContent>
             </Select>
             {formik.touched.gender && formik.errors.gender && (
@@ -155,7 +155,7 @@ export default function Register() {
           </div>
 
           {/* Username Input */}
-          <div>
+          <div className="mb-4">
             <Input
               id="username"
               name="username"
@@ -172,7 +172,7 @@ export default function Register() {
           </div>
 
           {/* Password Input */}
-          <div>
+          <div className="mb-4">
             <Input
               id="password"
               name="password"
@@ -188,7 +188,7 @@ export default function Register() {
             )}
           </div>
 
-          <Button className="w-full bg-[var(--dark-grey)] hover:bg-[--light-dark-grey] rounded" type="submit" disabled={formik.isSubmitting}>
+          <Button className="w-full bg-green-600 hover:bg-green-500 rounded p-2" type="submit" disabled={formik.isSubmitting}>
             Register
           </Button>
 

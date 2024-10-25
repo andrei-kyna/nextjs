@@ -3,7 +3,7 @@ import NavBar from '@/components/ui/navBar';
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['300', '400'],
+  weight: ['400', '300'],
 });
 
 export default function About() {
@@ -18,7 +18,7 @@ export default function About() {
 }
 // css
 const pageStyles = {
-  backgroundColor: '#111',
+  backgroundColor: '#fff',
   width: '225vh',   
   height: '100vh',           
   display: 'flex',
@@ -30,6 +30,6 @@ const aboutpageTitleStyles = {
   fontWeight: 900,       
   textTransform: 'uppercase', 
   marginTop: '80px',     
-  color: '#fff',         
+  color: '#000',         
   textAlign: 'center',  
 };

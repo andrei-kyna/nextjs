@@ -15,10 +15,10 @@ const poppins = Poppins({
 
 // Styles
 const pageStyles = {
-    backgroundColor: '#111',
+    backgroundColor: '#fff',
     width: '100vw',  // Set width to full viewport width
     minHeight: '100vh',
-    color: '#fff',
+    color: '#000',
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',
@@ -28,12 +28,12 @@ const pageStyles = {
 };
 
 const formStyles = {
-    backgroundColor: '#222',
+    backgroundColor: '#fff',
     minWidth: '35rem',
     maxWidth: '35rem',
     padding: '20px',
     borderRadius: '10px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    border: '1px solid black',
     margin: '20px auto',
     position: 'relative',
 };
@@ -61,7 +61,7 @@ const buttonStyles = {
   position: 'absolute',
   top: '60px', // Position it 20px from the top
   right: '20px', // Position it 20px from the right side
-  backgroundColor: '#333',
+  backgroundColor: '#28A745',
   color: '#fff',
   padding: '10px 15px',
   borderRadius: '5px',
@@ -169,7 +169,7 @@ export default function EditInquiry() {
                                     onBlur={formik.handleBlur}
                                     value={formik.values[field]}
                                     placeholder="Your message"
-                                    className="rounded bg-[#444] text-[#fff] placeholder-gray-500 focus-visible:ring-2 focus-visible:ring-[#fff]"
+                                    className="rounded bg-[#fff] text-[#000] placeholder-black focus-visible:ring-2 focus-visible:ring-[#000]"
                                 />
                             ) : (
                                 <Input
@@ -180,7 +180,7 @@ export default function EditInquiry() {
                                     onBlur={formik.handleBlur}
                                     value={formik.values[field]}
                                     placeholder={field.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
-                                    className="rounded bg-[#444] text-[#fff] placeholder-gray-500 focus-visible:ring-2 focus-visible:ring-[#fff]"
+                                    className="rounded bg-[#fff] text-[#000] placeholder-gray-500 focus-visible:ring-2 focus-visible:ring-[#000]"
                                 />
                             )}
                             {formik.touched[field] && formik.errors[field] && (
@@ -192,12 +192,12 @@ export default function EditInquiry() {
                     {/* Status Select */}
                     <div>
                         <Select onValueChange={(value) => formik.setFieldValue("status", value)} value={formik.values.status}>
-                            <SelectTrigger className="rounded bg-[#444] text-[#fff]">
-                                <SelectValue placeholder="Select Status" className="text-white"/>
+                            <SelectTrigger className="rounded bg-[#fff] text-[#000]">
+                                <SelectValue placeholder="Select Status" className="text-black"/>
                             </SelectTrigger>
-                            <SelectContent className="bg-[#222] rounded">
-                                <SelectItem className="hover:bg-[#333] text-white" value="Pending">Pending</SelectItem>
-                                <SelectItem className="hover:bg-[#333] text-white" value="Read">Read</SelectItem>
+                            <SelectContent className="bg-[#fff] rounded">
+                                <SelectItem className="hover:bg-[#fff] text-black" value="Pending">Pending</SelectItem>
+                                <SelectItem className="hover:bg-[#fff] text-black" value="Read">Read</SelectItem>
                             </SelectContent>
                         </Select>
                         {formik.touched.status && formik.errors.status && (
@@ -206,14 +206,13 @@ export default function EditInquiry() {
                     </div>
                     
                     {/* Submit Button */}
-                    <Button className="w-full bg-green-500 hover:bg-green-600 rounded" type="submit" disabled={formik.isSubmitting}>Update Inquiry</Button>
+                    <Button className="w-full bg-green-600 hover:bg-green-500 rounded" type="submit" disabled={formik.isSubmitting}>Update Inquiry</Button>
                     {formStatus && <p className="text-center">{formStatus}</p>}
                 </form>
             </div>
 
             {/* Back to Inquiries Button */}
             <Button 
-                className="bg-[#333] hover:bg-[#444] rounded" 
                 onClick={handleGoBack} 
                 style={buttonStyles}
             >

@@ -10,7 +10,7 @@ import NavBar from '@/components/ui/navBar';
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '900'],
+  weight: ['400', '300'],
 });
 
 export default function Contact() {
@@ -152,9 +152,9 @@ export default function Contact() {
 
 // Styles
 const pageStyles = {
-  backgroundColor: '#111',
+  backgroundColor: '#fff',
   width: '225vh',   
-  height: '125vh',           
+  height: '150vh',           
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -164,7 +164,7 @@ const contactHeaderStyles = {
   fontWeight: 900,
   textTransform: 'uppercase',
   marginTop: '24px',
-  color: '#fff', 
+  color: '#000', 
 };
 
 const formStyles = {
@@ -179,16 +179,16 @@ const inputStyles = {
   padding: '12px',
   border: '1px solid #ccc',
   borderRadius: '4px',
-  backgroundColor: '#333', 
-  color: '#fff', 
+  backgroundColor: '#fff', 
+  color: '#000', 
 };
 
 const textareaStyles = {
   padding: '12px',
   border: '1px solid #ccc',
   borderRadius: '4px',
-  backgroundColor: '#333', 
-  color: '#fff', 
+  backgroundColor: '#fff', 
+  color: '#000', 
   height: '150px',
 };
 

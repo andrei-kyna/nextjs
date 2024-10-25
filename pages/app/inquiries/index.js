@@ -8,7 +8,7 @@ import routes from '@/routes';
 
 const poppins = Poppins({ 
   subsets: ["latin"],
-  weight: ['400', '900'], 
+  weight: ['400', '300'], 
 });
 
 export default function Inquiries() {
@@ -121,9 +121,9 @@ export default function Inquiries() {
 
 // Styles for the Inquiries page
 const pageStyles = {
-  backgroundColor: '#111', 
+  backgroundColor: '#fff', 
   minHeight: '100vh',
-  color: '#fff',
+  color: '#000',
   padding: '20px',
 };
 const homepageTitleStyles = {
@@ -131,16 +131,16 @@ const homepageTitleStyles = {
   fontWeight: 900,       
   textTransform: 'uppercase', 
   marginTop: '80px',     
-  color: '#fff',         
+  color: '#000',         
   textAlign: 'center',
 };
 
 const containerStyles = {
   marginTop: '120px',  
   padding: '20px',  
-  backgroundColor: '#222',
+  backgroundColor: '#fff',
   borderRadius: '8px',
-  maxWidth: '95%',
+  maxWidth: '100%',
   margin: '0 auto',
 };
 
@@ -151,9 +151,9 @@ const tableStyles = {
 };
 
 const buttonStyles = {
-  backgroundColor: '#333',
+  backgroundColor: '#28A745',
   color: '#fff',
-  padding: '10px 15px',
+  padding: '10px 20px',
   borderRadius: '5px',
   cursor: 'pointer',
   textAlign: 'center',

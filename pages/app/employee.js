@@ -12,7 +12,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['300', '400'],
+  weight: ['400', '300'],
 });
 
 export default function Employee() {
@@ -68,7 +68,7 @@ export default function Employee() {
   }, [session, filter]);
 
   return (
-    <div className="flex flex-col gap-10 min-h-screen bg-[#111] text-white px-5" style={{ width: '225vh', height: '200vh' }}>
+    <div className="flex flex-col gap-10 min-h-screen bg-[#fff] text-black px-5" style={{ width: '225vh', height: '200vh' }}>
       <div className="flex flex-col items-center mt-10">
         <h1 className={`${poppins.className} text-center text-[5rem] font-[900] uppercase `}>
           Employee
@@ -79,7 +79,7 @@ export default function Employee() {
       <div className="flex flex-col items-center gap-10">
         <div className="flex flex-col gap-2 max-w-[35rem] w-full">
           <h1 className={`${poppins.className} text-left text-[1.5rem] font-[700] text-balance uppercase`}>
-            Set Pay Rate
+          Set Pay Rate
           </h1>
           <Formik
             initialValues={{
@@ -91,11 +91,11 @@ export default function Employee() {
             onSubmit={handleSubmit}
           >
             {({ handleSubmit, setFieldValue, values }) => (
-              <Form onSubmit={handleSubmit} className="flex flex-col gap-7 bg-[#111] border-[1px] border-gray-600 p-10 rounded-ss-xl rounded-ee-xl space-y-4">
+              <Form onSubmit={handleSubmit} className="flex flex-col gap-7 bg-[#fff] border-[1px] border-gray-600 p-10 rounded-ss-xl rounded-ee-xl space-y-4">
                 <div className="flex flex-col gap-5">
                   {/* Pay Rate */}
                   <div className="flex flex-col gap-1">
-                    <div className="flex flex-row items-center gap-2">
+                    <div className="flex flex-row items-center gap-2 text-black">
                       <p>Pay Rate</p>
                       <ErrorMessage name="payRate" component="div" className="text-red-500 text-sm" />
                     </div>
@@ -104,15 +104,14 @@ export default function Employee() {
                       name="payRate"
                       type="number"
                       placeholder="Enter a Pay Rate"
-                      className="rounded border-gray-400 focus-visible:ring-2 focus-visible:ring-gray-600"
                       value={values.payRate}
                       onChange={(e) => setFieldValue('payRate', Number(e.target.value))} 
                     />
                   </div>
                   {/* Pay Rate Schedule */}
                   <div className="flex flex-col gap-1">
-                    <div className="flex flex-row items-center gap-2">
-                      <p>Pay Rate Schedule</p>
+                    <div className="flex flex-row items-center gap-2 text-black">
+                      <p>Pay Period</p>
                       <ErrorMessage name="payRateSchedule" component="div" className="text-red-500 text-sm" />
                     </div>
                     <Select
@@ -120,16 +119,16 @@ export default function Employee() {
                       onValueChange={(value) => setFieldValue('payRateSchedule', value)}
                     >
                       <SelectTrigger className="rounded">
-                        <SelectValue placeholder="Select Rate Schedule" />
+                        <SelectValue placeholder="Select Pay Period"/>
                       </SelectTrigger>
-                      <SelectContent className="bg-[#111]">
-                        <SelectItem value="Hourly" className="text-white">Hourly</SelectItem>
-                        <SelectItem value="Daily" className="text-white">Daily</SelectItem>
+                      <SelectContent className="bg-[#fff]">
+                        <SelectItem value="Hourly" className="text-black">Hourly</SelectItem>
+                        <SelectItem value="Daily" className="text-black">Daily</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   {/* Effective Date */}
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1 text-black">
                     <p>Effective Date</p>
                     <DatePicker
                       date={values.effectiveDate}
@@ -142,7 +141,7 @@ export default function Employee() {
                 </div>
                 {/* Submit Button */}
                 <Button 
-                  className="w-full bg-gray-600 hover:bg-gray-500 rounded" 
+                  className="w-full bg-green-600 hover:bg-green-500 rounded" 
                   type="submit" 
                   disabled={isSubmitting}
                 >
@@ -159,13 +158,13 @@ export default function Employee() {
             <h1 className={`${poppins.className} text-left text-[1.5rem] font-[700] text-balance uppercase`}>Payment Records</h1>
             <Popover>
               <PopoverTrigger asChild>
-                <Button className="flex flex-row gap-2 bg-gray-600 hover:bg-gray-500 rounded">
+                <Button className="flex flex-row gap-2 bg-green-600 hover:bg-green-500 rounded">
                   <p>Filter by:</p>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="flex flex-col gap-1 p-4 rounded bg-[#111] border-gray-600 shadow-black shadow-sm">
+              <PopoverContent className="flex flex-col gap-1 p-4 rounded bg-white border-gray-600 shadow-black shadow-sm">
                 <Button
-                  className="bg-gray-600 hover:bg-gray-500 rounded"
+                  className="bg-green-600 hover:bg-green-500 rounded"
                   onClick={() => {
                     setFilter('daily');
                   }}
@@ -173,7 +172,7 @@ export default function Employee() {
                   Daily
                 </Button>
                 <Button
-                  className="bg-gray-600 hover:bg-gray-500 rounded"
+                  className="bg-green-600 hover:bg-green-500 rounded"
                   onClick={() => {
                     setFilter('weekly');
                   }}
@@ -181,7 +180,7 @@ export default function Employee() {
                   Weekly
                 </Button>
                 <Button
-                  className="bg-gray-600 hover:bg-gray-500 rounded"
+                  className="bg-green-600 hover:bg-green-500 rounded"
                   onClick={() => {
                     setFilter('monthly');
                   }}
@@ -191,12 +190,12 @@ export default function Employee() {
               </PopoverContent>
             </Popover>
           </div>
-          <div className="flex bg-[#111] rounded-ss-xl rounded-ee-xl p-5 border-[1px] border-gray-600">
-            <Table>
+          <div className="flex bg-white rounded-ss-xl rounded-ee-xl p-5 border-[1px] border-gray-600">
+            <Table classname="bg-white">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-36">Date</TableHead>
-                  <TableHead className="min-w-36">Payroll Amount</TableHead>
+                  <TableHead className="min-w-36 text-black">Date</TableHead>
+                  <TableHead className="min-w-36 text-black">Payroll Amount</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

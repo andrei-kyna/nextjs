@@ -11,12 +11,12 @@ import Link from 'next/link';
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '900'],
+  weight: ['400', '300'],
 });
 
 // Page container style
 const pageStyles = {
-  backgroundColor: '#111', // Background color
+  backgroundColor: '#fff', // Background color
   width: '225vh',
   minHeight: '100vh',
   color: '#fff',
@@ -28,12 +28,12 @@ const pageStyles = {
 
 // Form container style
 const formStyles = {
-  backgroundColor: '#222', // Form background color
+  backgroundColor: '#fff', // Form background color
   minWidth: '35rem',
   maxWidth: '35rem',
   padding: '2rem',
   borderRadius: '12px',
-  border: '1px solid rgba(255, 255, 255, 0.1)', // Border color
+  border: '1px solid black', // Border color
   boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)', // Shadow for depth
 };
 
@@ -92,11 +92,11 @@ export default function Login() {
     <div style={pageStyles}>
       <NavBar />
       <form onSubmit={formik.handleSubmit} style={formStyles}>
-        <h1 className={`${poppins.className} text-center text-[3rem] font-[900] uppercase`}>Login</h1>
-        <p className="text-center mt-4">Don&#39;t have an account? <Link href="/account/register" style={{ color: '#fff', textDecoration: 'underline' }}>Register</Link></p>
+        <h1 className={`${poppins.className} text-center text-[3rem] font-[900] uppercase text-black`}>Login</h1>
+        <p className="text-center mt-4 text-black">Don&#39;t have an account? <Link href="/account/register" style={{ color: '#000', textDecoration: 'underline' }}>Register</Link></p>
 
         {/* Username Input */}
-        <div>
+        <div className="mb-4"> 
           <Input
             id="username"
             name="username"
@@ -105,14 +105,14 @@ export default function Login() {
             onBlur={formik.handleBlur}
             value={formik.values.username}
             placeholder="Username"
-            className="rounded focus-visible:ring-2 focus-visible:ring-[rgba(255, 255, 255, 0.5)]"
+            className="rounded text-black focus-visible:ring-2 focus-visible:ring-[rgba(255, 255, 255, 0.5) p-2]"
           />
           {formik.touched.username && formik.errors.username && (
             <p className="text-red-500">{formik.errors.username}</p>
           )}
         </div>
 
-        <div>
+        <div className="mb-4">
           <Input
             id="password"
             name="password"
@@ -121,14 +121,14 @@ export default function Login() {
             onBlur={formik.handleBlur}
             value={formik.values.password}
             placeholder="Password"
-            className="rounded focus-visible:ring-2 focus-visible:ring-[rgba(255, 255, 255, 0.5)]"
+            className="rounded text-black focus-visible:ring-2 focus-visible:ring-[rgba(255, 255, 255, 0.5) p-2]"
           />
           {formik.touched.password && formik.errors.password && (
             <p className="text-red-500">{formik.errors.password}</p>
           )}
         </div>
 
-        <Button className="w-full bg-[#444] hover:bg-[#555] rounded" type="submit" disabled={formik.isSubmitting}>Login</Button>
+        <Button className="w-full bg-green-600 hover:bg-green-500 rounded p-2" type="submit" disabled={formik.isSubmitting}>Login</Button>
         
         {formStatus && <p className='text-center'>{formStatus}</p>}
       </form>

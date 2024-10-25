@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/u
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '900'],
+  weight: ['400', '300'],
 });
 
 export default function Timesheet() {
@@ -160,29 +160,29 @@ onSubmit: async (values) => {
   }
 
   return (
-    <div className='flex flex-col items-center gap-10 bg-[#111] text-white min-h-screen w-full' style={{ height: '770px', width: '1370px' }}>
+    <div className='flex flex-col items-center gap-10 bg-[#fff] text-black min-h-screen w-full' style={{ height: '770px', width: '1370px' }}>
       <h1 className={`${poppins.className} mt-10 text-center text-[3rem] font-[900] uppercase`}>Daily Timesheet</h1>
 
     {/* Status Message */}
     {lastAction === 'TIME_OUT' ? (
-          <p className={`${poppins.className} text-xl text-white`}>
+          <p className={`${poppins.className} text-xl text-black`}>
             You have logged a total of <b>{dailySummaries[0]?.totalTime || '00:00:00'}</b> hours today.
           </p>
         ) : lastAction === 'BREAK' ? (
-          <p className={`${poppins.className} text-xl text-white`}>
+          <p className={`${poppins.className} text-xl black`}>
             You have worked for <b>{dailySummaries[0]?.totalTime || '00:00:00'}</b> so far. Ready to resume?
           </p>
         ) : lastAction === 'TIME_IN' ? (
-          <p className={`${poppins.className} text-xl text-white`}>
+          <p className={`${poppins.className} text-xl text-black`}>
             Your timer is active. Click <b>Break</b> to pause or <b>Time Out</b> to stop.
           </p>
         ) : (
-          <p className={`${poppins.className} text-xl text-white`}>
+          <p className={`${poppins.className} text-xl text-black`}>
             Click <b>Time In</b> to start tracking your work hours.
           </p>
         )}
       <div className='flex flex-col gap-3 mt-10'>
-        <h1 className={`${poppins.className} ml-5 text-[var(--white)] text-[1.5rem] font-[900] uppercase`}>Summary:</h1>
+        <h1 className={`${poppins.className} ml-5 text-black text-[1.5rem] font-[900] uppercase`}>Summary:</h1>
         <div className="container mb-10 bg-[var(--dark)] p-5 rounded-ss-xl rounded-ee-xl border-[var(--ten-opacity-white)] border-[1px]">
           <Table className="min-w-[50rem]">
             <TableRow>
@@ -203,7 +203,7 @@ onSubmit: async (values) => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center pt-10 pb-5">
+                  <TableCell colSpan={4} className="text-center pt-10 pb-5 text-black">
                     You have no records for today.
                   </TableCell>
                 </TableRow>
@@ -216,12 +216,12 @@ onSubmit: async (values) => {
       {/* Time In/Out/Break Form */}
       <form
         onSubmit={formik.handleSubmit}
-        className="flex flex-row justify-center items-center gap-5 bg-[#111] p-10 rounded-xl mt-10 w-full"
+        className="flex flex-row justify-center items-center gap-5 bg-[#fff] p-10 rounded-xl mt-10 w-half border border-black"
       >
         <Button
           variant="default"
           type="button"
-          className="min-w-28 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
+          className="min-w-28 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
           onClick={async () => {
             setIsTimeInLoading(true);
             await formik.setFieldValue('action', 'TIME_IN');
@@ -236,7 +236,7 @@ onSubmit: async (values) => {
         <Button
           variant="default"
           type="button"
-          className="min-w-28 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
+          className="min-w-28 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
           onClick={async () => {
             setIsBreakLoading(true);
             await formik.setFieldValue('action', 'BREAK');
@@ -251,7 +251,7 @@ onSubmit: async (values) => {
         <Button
           variant="default"
           type="button"
-          className="min-w-28 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
+          className="min-w-28 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
           onClick={async () => {
             setIsTimeOutLoading(true);
             await formik.setFieldValue('action', 'TIME_OUT');

@@ -5,7 +5,7 @@ import { Poppins } from "next/font/google";
 
 const poppins = Poppins({ 
   subsets: ["latin"],
-  weight: ['400', '900'], 
+  weight: ['400', '300'], 
 });
 
 export default function InquiryDetails() {
@@ -91,10 +91,10 @@ export default function InquiryDetails() {
 
 // Styles for the Inquiry Details page
 const pageStyles = {
-  backgroundColor: '#111',
+  backgroundColor: '#fff',
   width: '225vh',
   minHeight: '100vh',
-  color: '#fff',
+  color: '#000',
   padding: '20px',
   position: 'relative', // Relative position for absolute positioning of the button
 };
@@ -104,7 +104,7 @@ const inquiryTitleStyles = {
   fontWeight: 900,
   textTransform: 'uppercase',
   marginTop: '80px',
-  color: '#fff',
+  color: '#000',
   textAlign: 'center',
 };
 
@@ -119,7 +119,7 @@ const backButtonStyles = {
   position: 'absolute',
   top: '60px', // Position it 20px from the top
   right: '20px', // Position it 20px from the right side
-  backgroundColor: '#333',
+  backgroundColor: '#28A745',
   color: '#fff',
   padding: '10px 15px',
   borderRadius: '5px',
@@ -129,11 +129,11 @@ const backButtonStyles = {
 };
 
 const inquiryDetailsStyles = {
-  backgroundColor: '#222',
+  backgroundColor: '#fff',
   padding: '20px',
   borderRadius: '10px',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
+  border: '1px solid black',
   maxWidth: '800px',
   width: '100%',
-  color: '#fff',
+  color: '#000',
 };

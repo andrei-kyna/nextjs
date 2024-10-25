@@ -27,7 +27,7 @@ export default function NavBar() {
   // Define dynamic styles based on scroll state
   const dynamicNavStyles = {
     ...navStyles,
-    backgroundColor: scrolled ? '#333' : '#000', // Darker navbar on scroll
+    backgroundColor: scrolled ? '#444' : '#fff', // Darker navbar on scroll
     transition: 'background-color 0.3s ease', // Smooth transition
   };
 
@@ -93,6 +93,6 @@ const liStyles = {
   marginRight: '20px',
 };
 const linkStyles = {
-  color: '#fff',
+  color: '#000',
   textDecoration: 'none',
 };

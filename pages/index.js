@@ -4,12 +4,12 @@ import { useSession } from "next-auth/react";
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '900'],
+  weight: ['400', '300'],
 });
 
 // Define the white color in CSS or use a direct color value
 const pageStyles = {
-  backgroundColor: '#111',
+  backgroundColor: '#fff',
   width: '225vh',   
   height: '100vh',           
   display: 'flex',
@@ -30,18 +30,18 @@ export default function HomePage() {
       <NavBar />
       <div>
         {session ? (
-          <h1 className={`${poppins.className} mt-40 text-white text-center text-[5rem] font-[900] uppercase`}>
+          <h1 className={`${poppins.className} mt-40 text-black text-center text-[5rem] font-[900] uppercase`}>
             Welcome,
             <br />
-            <p className="text-white">
+            <p className="text-black">
               {session.user.username}!
             </p>
           </h1>
         ) : (
-          <h2 className={`${poppins.className} mt-40 text-white text-center text-[5rem] font-[900] uppercase`}>
+          <h2 className={`${poppins.className} mt-40 text-black text-center text-[5rem] font-[900] uppercase`}>
             Welcome,
             <br />
-            <p className="text-white">
+            <p className="text-black">
               Guest
             </p>
           </h2>
