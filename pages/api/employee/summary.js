@@ -42,11 +42,13 @@ function getMonday(d) {
 function groupByWeek(records) {
   if (records.length === 0) return [];
 
+
+
   const weeks = [];
   let currentWeek = [];
-  let currentMonday = getMonday(new Date(records[0].date)); // Start with the first Monday
+  let currentMonday = getMonday(new Date(records[0].date)); 
   let currentSunday = new Date(currentMonday);
-  currentSunday.setDate(currentMonday.getDate() + 6); // Set to the next Sunday
+  currentSunday.setDate(currentMonday.getDate() + 6); 
 
   records.forEach((record) => {
     const recordDate = new Date(record.date);
@@ -60,6 +62,8 @@ function groupByWeek(records) {
         weeks.push({
           date: formatWeekRange(currentMonday, currentSunday),
           payAmount: currentWeek.reduce((sum, r) => sum + r.payAmount, 0),
+          duration: currentWeek.reduce((sum, { dailySummary }) => sum + (dailySummary?.totalTime ?? 0) / 3600, 0),
+          startDate: new Date(currentMonday),
         });
       }
 
@@ -100,10 +104,12 @@ function groupByMonth(records) {
       months[key] = {
         date: `${monthName} ${year}`,
         payAmount: 0,
+        duration: 0,
         sortKey,
       };
     }
     months[key].payAmount += record.payAmount;
+    months[key].duration += (record.dailySummary?.totalTime ?? 0) / 3600;
   });
 
   // Convert months object to array and sort
@@ -123,27 +129,48 @@ export default async function handler(req, res) {
     const employeeNo = session?.user.employeeID;
     const employee = await prisma.employee.findUnique({
       where: { employeeNo },
+      include: {
+      payRate: {
+      select: {
+      payRate: true,
+      payRateSchedule: true,
+      effectiveDate: true,
+          },
+        },
+      },
     });
-    
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found'
+      });
+    }
     const { filter } = req.query;
     const employeeId = employee.id;
+    const { payRate, payRateSchedule, effectiveDate } = employee.payRate || {};
     
     // Fetch payment records for the employee
     const paymentRecords = await prisma.paymentRecord.findMany({
       where: {
         employeeId,
       },
-      orderBy: { date: 'desc' },
+      include: {
+        dailySummary: {
+          select: {
+            totalTime: true,
+          },
+        },
+      },
     });
-
     let groupedRecords = [];
 
     if (filter === 'daily') {
-      // Daily records (no grouping needed)
-      groupedRecords = paymentRecords.map((record) => ({
-        date: formatDateForDisplay(record.date),
-        payAmount: record.payAmount,
-      }));
+      groupedRecords = paymentRecords
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .map((record) => ({
+          date: formatDateForDisplay(record.date),
+          payAmount: record.payAmount,
+          duration: (record.dailySummary?.totalTime ?? 0) / 3600,
+        }));
     } else if (filter === 'weekly') {
       // Group records by week
       groupedRecords = groupByWeek(paymentRecords);
@@ -159,7 +186,12 @@ export default async function handler(req, res) {
     }
 
     // Respond with the grouped payment records
-    return res.status(200).json(groupedRecords);
+    return res.status(200).json({
+      payRate,
+      payRateSchedule,
+      effectiveDate,
+      groupedRecords,
+    });
   } catch (error) {
     console.error('Error fetching payment records:', error);
     return res.status(400).json({ message: error.message });

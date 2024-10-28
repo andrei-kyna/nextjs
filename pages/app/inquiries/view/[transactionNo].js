@@ -1,12 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
-import { Poppins } from "next/font/google";
 
-const poppins = Poppins({ 
-  subsets: ["latin"],
-  weight: ['400', '300'], 
-});
 
 export default function InquiryDetails() {
   const router = useRouter();
@@ -60,7 +55,7 @@ export default function InquiryDetails() {
   // Render inquiry details when data is available
   return (
     <div style={pageStyles}>
-      <h1 className={`${poppins.className}`} style={inquiryTitleStyles}>
+      <h1 style={inquiryTitleStyles}>
         Inquiry Details
       </h1>
       <Button 
@@ -101,7 +96,6 @@ const pageStyles = {
 
 const inquiryTitleStyles = {
   fontSize: '4rem',
-  fontWeight: 900,
   textTransform: 'uppercase',
   marginTop: '80px',
   color: '#000',

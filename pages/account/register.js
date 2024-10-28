@@ -4,16 +4,10 @@ import { registerFormSchema } from '@/utils/validation-schema';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from '@/components/ui/input';
-import { Poppins } from 'next/font/google';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import NavBar from '@/components/ui/navBar';  
 import Link from 'next/link';
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '300'],
-});
 
 export default function Register() {
   const [formStatus, setFormStatus] = useState(null);
@@ -99,7 +93,7 @@ export default function Register() {
     <div style={pageStyles}>
       <NavBar />
       <div style={formStyles} className="space-y-4">
-        <h1 className={`${poppins.className} text-center text-black text-[3rem] font-[900] uppercase`}>Registration</h1>
+        <h1 className="text-center text-black text-[3rem] uppercase">Registration</h1>
         <form onSubmit={formik.handleSubmit}>
           <p className="text-center text-black">Already have an account? <Link href="/account/login" className="text-black hover:underline">Login</Link></p>
 

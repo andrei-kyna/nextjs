@@ -4,14 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
-import { Poppins } from "next/font/google";
 import NavBar from '@/components/ui/navBar';  
 
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '300'],
-});
 
 export default function Contact() {
   const [formStatus, setFormStatus] = useState(null);
@@ -54,7 +48,7 @@ export default function Contact() {
       
       {/* Contact Form Section */}
       <div className="flex flex-col gap-5" style={{ marginTop: '20px' }}>
-        <h1 className={`${poppins.className} text-center`} style={contactHeaderStyles}>Contact</h1>
+        <h1 className="text-center" style={contactHeaderStyles}>Contact</h1>
         <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4" style={formStyles}>
           <Input
             id="firstName"
@@ -161,7 +155,6 @@ const pageStyles = {
 }
 const contactHeaderStyles = {
   fontSize: '5rem',
-  fontWeight: 900,
   textTransform: 'uppercase',
   marginTop: '24px',
   color: '#000', 

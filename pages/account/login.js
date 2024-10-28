@@ -3,16 +3,10 @@ import { useFormik } from 'formik';
 import { loginFormSchema } from '@/utils/validation-schema';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Poppins } from 'next/font/google';
 import { useRouter } from 'next/router'; 
 import { signIn } from 'next-auth/react'; 
 import NavBar from '@/components/ui/navBar'; 
 import Link from 'next/link';
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '300'],
-});
 
 // Page container style
 const pageStyles = {
@@ -92,7 +86,7 @@ export default function Login() {
     <div style={pageStyles}>
       <NavBar />
       <form onSubmit={formik.handleSubmit} style={formStyles}>
-        <h1 className={`${poppins.className} text-center text-[3rem] font-[900] uppercase text-black`}>Login</h1>
+        <h1 className="text-center text-center text-[3rem] uppercase text-black">Login</h1>
         <p className="text-center mt-4 text-black">Don&#39;t have an account? <Link href="/account/register" style={{ color: '#000', textDecoration: 'underline' }}>Register</Link></p>
 
         {/* Username Input */}

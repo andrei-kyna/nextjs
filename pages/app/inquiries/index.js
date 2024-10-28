@@ -2,14 +2,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Poppins } from "next/font/google";
 import NavBar from '@/components/ui/navBar'; 
 import routes from '@/routes';
-
-const poppins = Poppins({ 
-  subsets: ["latin"],
-  weight: ['400', '300'], 
-});
 
 export default function Inquiries() {
   const [inquiries, setInquiries] = useState([]);
@@ -60,7 +54,7 @@ export default function Inquiries() {
   return (
     <div style={pageStyles}>
      <NavBar />
-      <h1 className={`${poppins.className} text-center`} style={homepageTitleStyles}>
+      <h1 className="text-center" style={homepageTitleStyles}>
         Inquiries
       </h1>
 
@@ -128,7 +122,6 @@ const pageStyles = {
 };
 const homepageTitleStyles = {
   fontSize: '5rem',      
-  fontWeight: 900,       
   textTransform: 'uppercase', 
   marginTop: '80px',     
   color: '#000',         

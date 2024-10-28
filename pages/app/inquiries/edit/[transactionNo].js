@@ -6,12 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Assuming Select component exists in Shadcn
-import { Poppins } from "next/font/google";
-
-const poppins = Poppins({ 
-    subsets: ["latin"],
-    weight: ['400', '900'],
-});
 
 // Styles
 const pageStyles = {
@@ -48,7 +42,6 @@ const titleContainerStyles = {
 
 const titleStyles = {
     fontSize: '5rem',
-    fontWeight: 900,
     textTransform: 'uppercase',
     marginTop: '20px',
     color: '#fff',
@@ -152,7 +145,7 @@ export default function EditInquiry() {
         <div style={pageStyles}>
             {/* Title Container */}
             <div style={titleContainerStyles}>
-                <h1 className={`${poppins.className}`} style={titleStyles}>Edit Inquiry</h1>
+                <h1 style={titleStyles}>Edit Inquiry</h1>
             </div>
 
             {/* Form Container */}

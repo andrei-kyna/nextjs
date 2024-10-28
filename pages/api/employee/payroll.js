@@ -7,12 +7,12 @@ const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
   try {
-    // 1. Validate the data using the "employeePayrateFormSchema".
+    // Validate data
     const validatedData = await employeePayrateFormSchema.validate(req.body);
 
     const { payRate, payRateSchedule, effectiveDate } = validatedData;
 
-    // 2. Get the current user and employeeId.
+    // Get the current user and employeeId.
     const session = await getServerSession(req, res, authOptions);
     const employeeNo = session?.user.employeeID;
     const employee = await prisma.employee.findUnique({
@@ -20,7 +20,8 @@ export default async function handler(req, res) {
     });
     const employeeId = employee.id;
 
-    // 3. Fetch all daily summaries of this employee where date is the effectiveDate
+
+    // Fetch all daily summaries of this employee where date is the effectiveDate
     const dailySummaries = await prisma.dailySummary.findMany({
       where: {
         employeeId: employeeId,
@@ -30,21 +31,21 @@ export default async function handler(req, res) {
       }
     });  
 
-    // 4. Process the payroll calculations.
+    // Process the payroll calculations.
     const paymentRecords = [];
 
     for (const summary of dailySummaries) {
-      // a. Get the totalTime in hours.
+      // Get the totalTime in hours.
       const totalHours = Math.floor(summary.totalTime / 3600); 
 
-      // b. Determine the rate.
+      // Determine the rate.
       let payAmount = 0;
 
       if (payRateSchedule === 'Hourly') {
         payAmount = totalHours * payRate;
       } 
       else if (payRateSchedule === 'Daily') {
-        payAmount = payRate; // Fixed daily rate
+        payAmount = payRate; 
       } 
       else {
         return res.status(400).json({ error: 'Invalid payRateSchedule' });
@@ -52,10 +53,11 @@ export default async function handler(req, res) {
       console.log("Upsert Data:", {
         employeeId: employeeId,
         date: summary.date,
+        dailySummaryId: summary.id,
         payAmount: payAmount,
       });
       
-      // c. Upsert the calculated payment.
+      // Upsert the calculated payment.
       const paymentRecord = await prisma.paymentRecord.upsert({
         where: {
           employeeId_date: {
@@ -70,6 +72,7 @@ export default async function handler(req, res) {
         create: {
           employeeId: employeeId,
           date: summary.date,
+          dailySummaryId: summary.id,
           payAmount: payAmount,
         },
       });

@@ -2,13 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from '@/components/ui/button';
 import { useFormik } from 'formik';
-import { Poppins } from 'next/font/google';
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '300'],
-});
 
 export default function Timesheet() {
   const { data: session, status } = useSession();
@@ -161,28 +155,28 @@ onSubmit: async (values) => {
 
   return (
     <div className='flex flex-col items-center gap-10 bg-[#fff] text-black min-h-screen w-full' style={{ height: '770px', width: '1370px' }}>
-      <h1 className={`${poppins.className} mt-10 text-center text-[3rem] font-[900] uppercase`}>Daily Timesheet</h1>
+      <h1 className="mt-10 text-center text-[3rem] uppercase">Daily Timesheet</h1>
 
     {/* Status Message */}
     {lastAction === 'TIME_OUT' ? (
-          <p className={`${poppins.className} text-xl text-black`}>
+          <p className="text-xl text-black">
             You have logged a total of <b>{dailySummaries[0]?.totalTime || '00:00:00'}</b> hours today.
           </p>
         ) : lastAction === 'BREAK' ? (
-          <p className={`${poppins.className} text-xl black`}>
+          <p className="text-xl black">
             You have worked for <b>{dailySummaries[0]?.totalTime || '00:00:00'}</b> so far. Ready to resume?
           </p>
         ) : lastAction === 'TIME_IN' ? (
-          <p className={`${poppins.className} text-xl text-black`}>
+          <p className="text-xl text-black">
             Your timer is active. Click <b>Break</b> to pause or <b>Time Out</b> to stop.
           </p>
         ) : (
-          <p className={`${poppins.className} text-xl text-black`}>
+          <p className="text-xl text-black">
             Click <b>Time In</b> to start tracking your work hours.
           </p>
         )}
       <div className='flex flex-col gap-3 mt-10'>
-        <h1 className={`${poppins.className} ml-5 text-black text-[1.5rem] font-[900] uppercase`}>Summary:</h1>
+        <h1 className="{ml-5 text-black text-[1.5rem] uppercase">Summary:</h1>
         <div className="container mb-10 bg-[var(--dark)] p-5 rounded-ss-xl rounded-ee-xl border-[var(--ten-opacity-white)] border-[1px]">
           <Table className="min-w-[50rem]">
             <TableRow>

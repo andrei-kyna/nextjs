@@ -1,11 +1,5 @@
-import { Poppins } from "next/font/google";
 import NavBar from '@/components/ui/navBar';
 import { useSession } from "next-auth/react";  
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '300'],
-});
 
 // Define the white color in CSS or use a direct color value
 const pageStyles = {
@@ -30,7 +24,7 @@ export default function HomePage() {
       <NavBar />
       <div>
         {session ? (
-          <h1 className={`${poppins.className} mt-40 text-black text-center text-[5rem] font-[900] uppercase`}>
+          <h1 className="mt-40 text-black text-center text-[5rem] uppercase">
             Welcome,
             <br />
             <p className="text-black">
@@ -38,7 +32,7 @@ export default function HomePage() {
             </p>
           </h1>
         ) : (
-          <h2 className={`${poppins.className} mt-40 text-black text-center text-[5rem] font-[900] uppercase`}>
+          <h2 className="mt-40 text-black text-center text-[5rem] uppercase">
             Welcome,
             <br />
             <p className="text-black">

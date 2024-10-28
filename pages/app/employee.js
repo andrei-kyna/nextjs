@@ -3,24 +3,25 @@ import { employeePayrateFormSchema } from '@/utils/validation-schema';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
-import { Poppins } from 'next/font/google';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; 
 import { Table, TableBody, TableCell, TableHead, TableRow, TableHeader } from "@/components/ui/table";
 import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
 import { DatePicker } from '@/components/ui/date-picker';
 
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '300'],
-});
 
 export default function Employee() {
+  // State to handle form submission and button disable logic
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentRecords, setPaymentRecords] = useState([]);
   const { data: session } = useSession();
   const [filter, setFilter] = useState('daily');
-
+  const [loading, setLoading] = useState(true);
+  const [initialPayRate, setInitialPayRate] = useState({
+    payRate: '',
+    payRateSchedule: '',
+    effectiveDate: '',
+  });
   const handleSubmit = async (values, { setSubmitting }) => {
     setIsSubmitting(true);
     try {
@@ -31,56 +32,61 @@ export default function Employee() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(values), 
       });
 
       if (response.ok) {
         console.log('Payrate calculation successful');
         fetchPaymentRecords();
-      } else {
+      } 
+      else {
         console.error('Error calculating payrate');
       }
-    } catch (error) {
+    } 
+    catch (error) {
       console.error('Error submitting the form:', error);
     }
     setIsSubmitting(false);
     setSubmitting(false);
   };
-
   const fetchPaymentRecords = async () => {
+    setPaymentRecords([]); // Clear current records to prevent stale data display
+    
     try {
       const response = await fetch(`/api/employee/summary?filter=${filter}`);
       const data = await response.json();
-      if (response.ok) {
-        setPaymentRecords(data);
-      } else {
+      if (response.ok && data) {
+        setInitialPayRate({
+          payRate: data.payRate || '',
+          payRateSchedule: data.payRateSchedule || '',
+          effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : '',
+        });
+        setPaymentRecords(data.groupedRecords || []);  // Ensure groupedRecords is an array
+      } 
+      else {
         console.error('Error fetching payment records:', response.statusText);
       }
-    } catch (error) {
+    } 
+    catch (error) {
       console.error('Error fetching payment records:', error);
     }
+    
   };
 
+  //Fetch Payment Records
   useEffect(() => {
-    if (session) {
+    if (session) 
       fetchPaymentRecords();
-    }
   }, [session, filter]);
-
+  
   return (
-    <div className="flex flex-col gap-10 min-h-screen bg-[#fff] text-black px-5" style={{ width: '225vh', height: '200vh' }}>
-      <div className="flex flex-col items-center mt-10">
-        <h1 className={`${poppins.className} text-center text-[5rem] font-[900] uppercase `}>
-          Employee
-        </h1>
-      </div>
-
-      {/* Pay Rate Form */}
-      <div className="flex flex-col items-center gap-10">
-        <div className="flex flex-col gap-2 max-w-[35rem] w-full">
-          <h1 className={`${poppins.className} text-left text-[1.5rem] font-[700] text-balance uppercase`}>
-          Set Pay Rate
-          </h1>
+    <div className="flex flex-col items-center min-h-screen bg-[#f5f5f5] text-black px-10 py-10" style={{ width: '225vh' }}>
+      <h1 className="text-[3rem] font-bold uppercase mb-10">Employee</h1>
+      <div className="flex flex-row gap-10 w-full max-w-[80rem]">
+        {/* Pay Rate Form */}
+        <div className="flex flex-col gap-6 bg-white p-8 rounded-lg shadow-md border w-1/2">
+          <h2 className="text-left text-[1.5rem] font-semibold text-gray-800 uppercase">Set Pay Rate</h2>
+          
           <Formik
             initialValues={{
               payRate: '',
@@ -90,59 +96,56 @@ export default function Employee() {
             validationSchema={employeePayrateFormSchema}
             onSubmit={handleSubmit}
           >
-            {({ handleSubmit, setFieldValue, values }) => (
-              <Form onSubmit={handleSubmit} className="flex flex-col gap-7 bg-[#fff] border-[1px] border-gray-600 p-10 rounded-ss-xl rounded-ee-xl space-y-4">
-                <div className="flex flex-col gap-5">
-                  {/* Pay Rate */}
-                  <div className="flex flex-col gap-1">
-                    <div className="flex flex-row items-center gap-2 text-black">
-                      <p>Pay Rate</p>
-                      <ErrorMessage name="payRate" component="div" className="text-red-500 text-sm" />
-                    </div>
-                    <Input
-                      id="payRate"
-                      name="payRate"
-                      type="number"
-                      placeholder="Enter a Pay Rate"
-                      value={values.payRate}
-                      onChange={(e) => setFieldValue('payRate', Number(e.target.value))} 
-                    />
-                  </div>
-                  {/* Pay Rate Schedule */}
-                  <div className="flex flex-col gap-1">
-                    <div className="flex flex-row items-center gap-2 text-black">
-                      <p>Pay Period</p>
-                      <ErrorMessage name="payRateSchedule" component="div" className="text-red-500 text-sm" />
-                    </div>
-                    <Select
-                      value={values.payRateSchedule}
-                      onValueChange={(value) => setFieldValue('payRateSchedule', value)}
-                    >
-                      <SelectTrigger className="rounded">
-                        <SelectValue placeholder="Select Pay Period"/>
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#fff]">
-                        <SelectItem value="Hourly" className="text-black">Hourly</SelectItem>
-                        <SelectItem value="Daily" className="text-black">Daily</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {/* Effective Date */}
-                  <div className="flex flex-col gap-1 text-black">
-                    <p>Effective Date</p>
-                    <DatePicker
-                      date={values.effectiveDate}
-                      onChange={(date) => {
-                        setFieldValue('effectiveDate', date);
-                      }}
-                    />
-                    <ErrorMessage name="effectiveDate" component="div" className="text-red-500 text-sm" />
-                  </div>
+            {({ handleSubmit, setFieldValue, values}) => (
+              <Form onSubmit={handleSubmit} className="space-y-6">
+                {/* Pay Rate Input */}
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="payRate" className="text-gray-700">Pay Rate</label>
+                  <Input
+                    id="payRate"
+                    name="payRate"
+                    type="number"
+                    placeholder="Enter Pay Rate"
+                    value={values.payRate}
+                    onChange={(e) => setFieldValue('payRate', Number(e.target.value))}
+                    className="rounded border-gray-300"
+                  />
+                  <ErrorMessage name="payRate" component="div" className="text-red-500 text-sm" />
                 </div>
+
+                {/* Pay Rate Schedule */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-gray-700">Pay Period</label>
+                  <Select
+                    value={values.payRateSchedule}
+                    onValueChange={(value) => setFieldValue('payRateSchedule', value)}
+                  >
+                    <SelectTrigger className="rounded border-gray-300">
+                      <SelectValue placeholder="Select Pay Period" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="Hourly">Hourly</SelectItem>
+                      <SelectItem value="Daily">Daily</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <ErrorMessage name="payRateSchedule" component="div" className="text-red-500 text-sm" />
+                </div>
+
+                {/* Effective Date */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-gray-700">Effective Date</label>
+                  <DatePicker
+                    date={values.effectiveDate}
+                    onChange={(date) => setFieldValue('effectiveDate', date)}
+                    className="rounded border-gray-300"
+                  />
+                  <ErrorMessage name="effectiveDate" component="div" className="text-red-500 text-sm" />
+                </div>
+
                 {/* Submit Button */}
-                <Button 
-                  className="w-full bg-green-600 hover:bg-green-500 rounded" 
-                  type="submit" 
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-500 rounded text-white py-2"
+                  type="submit"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit'}
@@ -153,62 +156,49 @@ export default function Employee() {
         </div>
 
         {/* Payment Records */}
-        <div className="flex flex-col w-full gap-5 mt-10">
-          <div className="flex flex-row justify-between items-center">
-            <h1 className={`${poppins.className} text-left text-[1.5rem] font-[700] text-balance uppercase`}>Payment Records</h1>
+        <div className="flex flex-col w-1/2 bg-white p-8 rounded-lg shadow-md border">
+          <div className="flex flex-row justify-between items-center mb-5">
+            <h2 className="text-[1.5rem] font-semibold text-gray-800 uppercase">Payment Records</h2>
             <Popover>
               <PopoverTrigger asChild>
-                <Button className="flex flex-row gap-2 bg-green-600 hover:bg-green-500 rounded">
-                  <p>Filter by:</p>
+                <Button className="bg-green-600 hover:bg-green-500 text-white rounded py-1 px-4">
+                  Filter by:
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="flex flex-col gap-1 p-4 rounded bg-white border-gray-600 shadow-black shadow-sm">
-                <Button
-                  className="bg-green-600 hover:bg-green-500 rounded"
-                  onClick={() => {
-                    setFilter('daily');
-                  }}
-                >
-                  Daily
-                </Button>
-                <Button
-                  className="bg-green-600 hover:bg-green-500 rounded"
-                  onClick={() => {
-                    setFilter('weekly');
-                  }}
-                >
-                  Weekly
-                </Button>
-                <Button
-                  className="bg-green-600 hover:bg-green-500 rounded"
-                  onClick={() => {
-                    setFilter('monthly');
-                  }}
-                >
-                  Monthly
-                </Button>
+              <PopoverContent className="p-4 bg-white rounded shadow border border-gray-300 space-y-2">
+                <Button className="bg-green-600 hover:bg-green-500 text-white rounded py-1 w-full" onClick={() => setFilter('daily')}>Daily</Button>
+                <Button className="bg-green-600 hover:bg-green-500 text-white rounded py-1 w-full" onClick={() => setFilter('weekly')}>Weekly</Button>
+                <Button className="bg-green-600 hover:bg-green-500 text-white rounded py-1 w-full" onClick={() => setFilter('monthly')}>Monthly</Button>
               </PopoverContent>
             </Popover>
           </div>
-          <div className="flex bg-white rounded-ss-xl rounded-ee-xl p-5 border-[1px] border-gray-600">
-            <Table classname="bg-white">
+
+          <div className="overflow-x-auto">
+            <Table className="bg-white w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-36 text-black">Date</TableHead>
-                  <TableHead className="min-w-36 text-black">Payroll Amount</TableHead>
+                  <TableHead className="text-gray-800">Payroll Amount</TableHead>
+                  <TableHead className="text-gray-800">Duration</TableHead>
+                  <TableHead className="text-gray-800">Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paymentRecords.length > 0 ? (
                   paymentRecords.map((record) => (
                     <TableRow key={record.date}>
-                      <TableCell>{record.date}</TableCell>
                       <TableCell>${record.payAmount.toFixed(2)}</TableCell>
+                      <TableCell>{record.duration
+                        ? `${Math.floor(record.duration)} hrs${
+                        record.duration % 1 !== 0 ? ` and ${Math.round((record.duration % 1) * 60)} minutes` : ""
+                        }`
+                        : 'N/A'}
+                        </TableCell>
+                      <TableCell>{record.date}</TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan="2">No payment records found.</TableCell>
+                    <TableCell colSpan="3" className="text-center">No payment records found.</TableCell>
                   </TableRow>
                 )}
               </TableBody>
