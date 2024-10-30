@@ -1,149 +1,174 @@
-import { useState, useEffect, useCallback } from "react"; 
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from '@/components/ui/button';
 import { useFormik } from 'formik';
-import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import NavBar from '@/components/ui/navBar';
+import * as XLSX from "xlsx"; // Import xlsx library
 
 export default function Timesheet() {
   const { data: session, status } = useSession();
-  const [lastAction, setLastAction] = useState(''); 
-  const [dailySummaries, setDailySummaries] = useState([]); 
-  const [loading, setLoading] = useState(true); 
 
-  // Individual loading states for each button
+  // Define state variables
+  const [lastAction, setLastAction] = useState('');
+  const [dailySummaries, setDailySummaries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [showUploadBox, setShowUploadBox] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importMessage, setImportMessage] = useState(null); // State for success/error message
+  const [importMessageColor, setImportMessageColor] = useState("");
+
+  // Loading states for actions
   const [isTimeInLoading, setIsTimeInLoading] = useState(false);
   const [isBreakLoading, setIsBreakLoading] = useState(false);
   const [isTimeOutLoading, setIsTimeOutLoading] = useState(false);
 
-  // Memoize fetchTimesheetData using useCallback
+  const fileInputRef = useRef(null);
+
   const fetchTimesheetData = useCallback(async () => {
     if (session) {
       try {
         const res = await fetch('/api/timesheet/summary');
-        if (!res.ok) {
-          throw new Error('Failed to fetch timesheet summary');
-        }
         const data = await res.json();
-        setLastAction(data.lastAction || ''); 
-        setDailySummaries(data.dailySummaries || []); 
+        setLastAction(data.lastAction || '');
+        setDailySummaries(data.dailySummaries || []);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching timesheet data:', error);
-      } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     }
   }, [session]);
 
   useEffect(() => {
     fetchTimesheetData();
-  }, [session, fetchTimesheetData]); // You no longer need fetchTimesheetData here as a dependency
+  }, [session, fetchTimesheetData]);
 
-  // Convert UTC time span string (e.g., "04:34 AM to 04:35 AM") to local time
-function convertTimeSpanToLocal(timeSpan) {
-  // Split the timeSpan into two parts (start and end times)
-  if (!timeSpan) return '';
+  const formik = useFormik({
+    initialValues: { action: '' },
+    onSubmit: async (values) => {
+      try {
+        if (!session && status !== 'loading') {
+          console.error("No session found");
+          return;
+        }
+        const res = await fetch('/api/timesheet/insert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: values.action }),
+        });
 
-  // Check if the timeSpan includes ' to ' indicating a range
-  if (timeSpan.includes(' to ')) {
-    const [startTimeUTC, endTimeUTC] = timeSpan.split(' to ').map(time => time.trim());
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error('Failed to log timesheet', errorData);
+          return;
+        }
 
-  // If start and end times are the same, return only one time
-  if (startTimeUTC === endTimeUTC) {
-    const localTime = new Date(`1970-01-01T${convertTo24HourFormat(startTimeUTC)}Z`).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-    return localTime;
-  }
-  
-  // Convert start time from UTC to the user's local time
-  const localStartTime = new Date(`1970-01-01T${convertTo24HourFormat(startTimeUTC)}Z`).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
+        await fetchTimesheetData();
+      } catch (error) {
+        console.error('Error submitting timesheet:', error);
+      }
+    },
   });
 
-  // Convert end time from UTC to the user's local time
-  const localEndTime = new Date(`1970-01-01T${convertTo24HourFormat(endTimeUTC)}Z`).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  // Function to handle file import
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    processFile(file);
+  };
 
-  // Return the local time span as a string (start to end)
-  return `${localStartTime} to ${localEndTime}`;
-} else {
-  // Only one time present, convert and return it
-  const localTime = new Date(`1970-01-01T${convertTo24HourFormat(timeSpan)}Z`).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const processFile = async (file) => {
+    if (!file) return;
 
-  return localTime;
-}
-}
+    setIsImporting(true);
+    setImportMessage(null); // Clear previous messages
 
-// Helper function to convert 12-hour format (e.g., "04:34 AM") to 24-hour format for Date parsing
-function convertTo24HourFormat(timeString) {
-if (!timeString || !timeString.includes(' ')) {
-  console.error("Invalid time format:", timeString);
-  return "00:00:00"; // Return default value in case of invalid format
-}
-
-const [time, period] = timeString.split(' ');
-let [hours, minutes] = time.split(':').map(Number);
-
-if (period === 'PM' && hours < 12) {
-  hours += 12; // Convert PM times
-} else if (period === 'AM' && hours === 12) {
-  hours = 0; // Handle midnight case
-}
-
-return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
-}
-
-// Convert UTC date string (e.g., "Mon, Oct 14, 2024") to local date
-function convertDateToLocal(utcDateString) {
-const utcDate = new Date(utcDateString + ' UTC'); // Add 'UTC' to parse correctly
-return utcDate.toLocaleDateString('en-US', {
-  weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
-});
-}
-
-// Form handling for timesheet actions
-const formik = useFormik({
-initialValues: {
-  action: '',
-},
-onSubmit: async (values) => {
-  try {
-    if (!session && status !== 'loading') {
-      console.error("No session found");
+    // Validate if the uploaded file is an Excel file
+    if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+      setError("Please upload a valid Excel file (.xlsx or .xls)");
+      setIsImporting(false);
       return;
     }
-    const res = await fetch('/api/timesheet/insert', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        action: values.action,
-      }),
-    });
+    setError(null); // Clear any previous error
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      console.error('Failed to log timesheet', errorData);
-      return;
-    }
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-    // Refetch the timesheet data to update lastAction and daily summaries (including total time)
-    await fetchTimesheetData();
-  } 
-  catch (error) {
-    console.error('Error submitting timesheet:', error);
-  }
-},
-});
+      try {
+        // Send imported data to backend for processing
+        const response = await fetch('/api/timesheet/insert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ logs: jsonData })
+        });
 
+        const result = await response.json();
+        if (response.ok) {
+          setImportMessage("Your import is successful");
+          setImportMessageColor("text-green-500");
+          await fetchTimesheetData(); // Refresh table data
+        } else {
+          setImportMessage(`Import error: ${result.message}`);
+          setImportMessageColor("text-red-500");
+        }
+      } catch (err) {
+        console.error("Error during import:", err);
+        setImportMessage("Import failed. Please try again.");
+        setImportMessageColor("text-red-500");
+      } finally {
+        setIsImporting(false);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  // Drag-and-drop event handlers
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setIsDragOver(false);
+    const file = event.dataTransfer.files[0];
+    processFile(file);
+  };
+
+  // Function to open the file dialog
+  const openFileDialog = () => {
+    fileInputRef.current.click();
+  };
+
+  // Function to export the timesheet data to Excel
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(dailySummaries.map((summary, index) => ({
+      "Employee Name": summary.fullName,
+      Date: convertDateToLocal(summary.date),
+      Duration: summary.totalTime,
+      "Time Span": convertTimeSpanToLocal(summary.timeSpan),
+      "Created At": convertDateToLocal(summary.createdAt),
+      "Updated At": convertDateToLocal(summary.updatedAt),
+    })));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Timesheet");
+
+    // Save the file
+    XLSX.writeFile(wb, "Timesheet.xlsx");
+  };
+
+  // Define disabled button states
   const isTimeInDisabled = lastAction === 'TIME_IN' || lastAction === 'TIME_OUT';
   const isBreakDisabled = lastAction !== 'TIME_IN' || lastAction === 'TIME_OUT';
   const isTimeOutDisabled = lastAction === 'TIME_OUT' || lastAction === '' || lastAction === 'BREAK';
@@ -154,75 +179,128 @@ onSubmit: async (values) => {
   }
 
   return (
-    <div className='flex flex-col items-center gap-10 bg-[#fff] text-black min-h-screen w-full' style={{ height: '770px', width: '1370px' }}>
-      <h1 className="mt-10 text-center text-[3rem] uppercase">Daily Timesheet</h1>
+    <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)] font-satoshi-regular">
+      <NavBar />
+      <h1 className="text-center text-[5rem] font-satoshi-bold uppercase mt-10 mb-12">Timesheet</h1>
 
-    {/* Status Message */}
-    {lastAction === 'TIME_OUT' ? (
-          <p className="text-xl text-black">
-            You have logged a total of <b>{dailySummaries[0]?.totalTime || '00:00:00'}</b> hours today.
-          </p>
-        ) : lastAction === 'BREAK' ? (
-          <p className="text-xl black">
-            You have worked for <b>{dailySummaries[0]?.totalTime || '00:00:00'}</b> so far. Ready to resume?
-          </p>
-        ) : lastAction === 'TIME_IN' ? (
-          <p className="text-xl text-black">
-            Your timer is active. Click <b>Break</b> to pause or <b>Time Out</b> to stop.
-          </p>
-        ) : (
-          <p className="text-xl text-black">
-            Click <b>Time In</b> to start tracking your work hours.
-          </p>
-        )}
-      <div className='flex flex-col gap-3 mt-10'>
-        <h1 className="{ml-5 text-black text-[1.5rem] uppercase">Summary:</h1>
-        <div className="container mb-10 bg-[var(--dark)] p-5 rounded-ss-xl rounded-ee-xl border-[var(--ten-opacity-white)] border-[1px]">
-          <Table className="min-w-[50rem]">
+      {/* Import Logs and Export Timesheet Buttons */}
+      <div className="flex justify-center gap-5 mb-8">
+        <Button
+          variant="default"
+          className="p-3 w-xl bg-gray-800 text-white rounded-md hover:bg-gray-700 hover:text-white transition-colors duration-300 border border-black"
+          onClick={() => setShowUploadBox(!showUploadBox)}
+        >
+          Import Logs
+        </Button>
+        <Button
+          variant="default"
+          className="p-3 w-xl bg-gray-800  text-white rounded-md hover:bg-gray-700 hover:text-white transition-colors duration-300 border border-black"
+          onClick={exportToExcel}
+        >
+          Export Timesheet
+        </Button>
+      </div>
+
+      {/* Conditional rendering of the drag-and-drop box */}
+      {showUploadBox && (
+        <div
+          onClick={openFileDialog}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`border-2 border-dashed p-8 rounded-md text-center cursor-pointer ${
+            isDragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+          } mb-4`}
+        >
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+            accept=".xlsx, .xls"
+          />
+          {isImporting ? (
+            <p>Loading... Importing file</p>
+          ) : (
+            <p>Drag and drop an Excel file here, or click to select</p>
+          )}
+        </div>
+      )}
+
+      {/* Display import success/error message */}
+      {importMessage && <p className={`text-center ${importMessageColor} mb-4`}>{importMessage}</p>}
+
+      {/* Display error message if file is not an Excel file */}
+      {error && <p className="text-center text-red mb-4">{error}</p>}
+
+      {/* Timesheet Table */}
+    <h1 className="item-start text-[3rem] font-satoshi-bold uppercase ">Employee Daily Summary</h1>
+      <div className="container mx-auto p-8 rounded-xl border border-black">
+        <Table className="w-full table-auto border-collapse">
+          <TableHeader>
             <TableRow>
               <TableHead>Employee Name</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Duration</TableHead>
               <TableHead>Time Span</TableHead>
             </TableRow>
-            <TableBody>
-              {dailySummaries.length > 0 ? (
-                dailySummaries.map((summary, index) => (
-                  <TableRow key={index}>
-                  <TableCell>{summary.fullName}</TableCell>
-                  <TableCell>{convertDateToLocal(summary.date)}</TableCell>
-                  <TableCell>{summary.totalTime}</TableCell>
-                  <TableCell>{convertTimeSpanToLocal(summary.timeSpan)}</TableCell>
+          </TableHeader>
+          <TableBody>
+            {dailySummaries.length > 0 ? (
+              dailySummaries.map((summary, index) => (
+                <TableRow key={index} className="border-t border-black hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-300">
+                  <TableCell className="border-none">{summary.fullName}</TableCell>
+                  <TableCell className="border-none">{convertDateToLocal(summary.date)}</TableCell>
+                  <TableCell className="border-none">{summary.totalTime}</TableCell>
+                  <TableCell className="border-none">{convertTimeSpanToLocal(summary.timeSpan)}</TableCell>
                 </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center pt-10 pb-5 text-black">
-                    You have no records for today.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+              ))
+            ) : (
+              <TableRow className="border-t border-black">
+                <TableCell colSpan={5} className="text-center pt-10 pb-5">
+                  You have no records for today.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
 
-      {/* Time In/Out/Break Form */}
+      {/* Status messages based on last action */}
+      {lastAction === 'TIME_OUT' ? (
+        <p className="text-xl text-center mt-8">
+          You have logged a total of <b>{dailySummaries[0]?.totalTime || '00:00:00'}</b> hours today.
+        </p>
+      ) : lastAction === 'BREAK' ? (
+        <p className="text-xl text-center mt-8">
+          You have worked for <b>{dailySummaries[0]?.totalTime || '00:00:00'}</b> so far.
+        </p>
+      ) : lastAction === 'TIME_IN' ? (
+        <p className="text-xl text-center mt-8">
+          Your timer is active. Click <b>Break</b> to pause or <b>Time Out</b> to stop.
+        </p>
+      ) : (
+        <p className="text-xl text-center mt-8">
+          Click <b>Time In</b> to start tracking your work hours.
+        </p>
+      )}
+
+      {/* Buttons for Time In, Break, and Time Out */}
       <form
         onSubmit={formik.handleSubmit}
-        className="flex flex-row justify-center items-center gap-5 bg-[#fff] p-10 rounded-xl mt-10 w-half border border-black"
+        className="flex flex-row justify-center items-center gap-5 p-5 rounded-lg mt-10 w-full max-w-6xl"
       >
         <Button
           variant="default"
           type="button"
-          className="min-w-28 bg-gray-800 hover:bg-gray-700 rounded text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
+          className="p-3 w-full bg-gray-800 text-white rounded-md hover:bg-gray-700 hover:text-white transition-colors duration-300 border border-black"
           onClick={async () => {
             setIsTimeInLoading(true);
             await formik.setFieldValue('action', 'TIME_IN');
             await formik.submitForm();
             setIsTimeInLoading(false);
           }}
-          disabled={isTimeInLoading || (!isInitialState && isTimeInDisabled)} 
+          disabled={isTimeInLoading || (!isInitialState && isTimeInDisabled)}
         >
           {isTimeInLoading ? 'Processing...' : 'Time In'}
         </Button>
@@ -230,14 +308,14 @@ onSubmit: async (values) => {
         <Button
           variant="default"
           type="button"
-          className="min-w-28 bg-gray-800 hover:bg-gray-700 rounded text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
+          className="p-3 w-full bg-gray-800 text-white rounded-md hover:bg-gray-700 hover:text-white transition-colors duration-300 border border-black"
           onClick={async () => {
             setIsBreakLoading(true);
             await formik.setFieldValue('action', 'BREAK');
             await formik.submitForm();
             setIsBreakLoading(false);
           }}
-          disabled={isBreakLoading || isBreakDisabled} 
+          disabled={isBreakLoading || isBreakDisabled}
         >
           {isBreakLoading ? 'Processing...' : 'Break'}
         </Button>
@@ -245,18 +323,62 @@ onSubmit: async (values) => {
         <Button
           variant="default"
           type="button"
-          className="min-w-28 bg-gray-800 hover:bg-gray-700 rounded text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
+          className="p-3 w-full bg-gray-800 text-white rounded-md hover:bg-gray-700 hover:text-white transition-colors duration-300 border border-black"
           onClick={async () => {
             setIsTimeOutLoading(true);
             await formik.setFieldValue('action', 'TIME_OUT');
             await formik.submitForm();
             setIsTimeOutLoading(false);
           }}
-          disabled={isTimeOutLoading || isTimeOutDisabled} 
+          disabled={isTimeOutLoading || isTimeOutDisabled}
         >
           {isTimeOutLoading ? 'Processing...' : 'Time Out'}
         </Button>
       </form>
     </div>
   );
+}
+
+// Helper functions to convert UTC to local time and date
+function convertTimeSpanToLocal(timeSpan) {
+  if (!timeSpan) return 'N/A';
+  const [startTimeUTC, endTimeUTC] = timeSpan.split(' to ').map((time) => time.trim());
+
+  const localStartTime = new Date(`1970-01-01T${convertTo24HourFormat(startTimeUTC)}Z`).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit', // Include seconds
+  });
+
+  if (!endTimeUTC) {
+    return localStartTime;
+  }
+
+  const localEndTime = new Date(`1970-01-01T${convertTo24HourFormat(endTimeUTC)}Z`).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit', // Include seconds
+  });
+
+  return `${localStartTime} to ${localEndTime}`;
+}
+
+function convertTo24HourFormat(timeString) {
+  if (!timeString.includes(' ')) return "00:00:00";
+
+  const [time, period] = timeString.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (period === 'PM' && hours < 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+}
+
+function convertDateToLocal(utcDateString) {
+  if (!utcDateString) return 'Invalid Date';
+  const utcDate = new Date(utcDateString);
+  return utcDate.toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+  });
 }

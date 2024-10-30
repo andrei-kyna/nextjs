@@ -17,7 +17,7 @@ model Inquiries {
   subject       String
   message       String
   status        String   @default("pending")
-  transactionNo String   @unique  // Ensure transactionNo is defined and unique
+  transactionNo String   @unique  
   created       DateTime @default(now())
   modified      DateTime @updatedAt
 }
