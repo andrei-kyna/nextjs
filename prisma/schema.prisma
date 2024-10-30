@@ -82,9 +82,10 @@ model PaymentRecord {
   dailySummaryId  Int           @unique
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
-  employee      Employee @relation(fields: [employeeId], references: [id])
-  dailySummary  DailySummary  @relation(fields: [dailySummaryId], references: [id], name: "dailySummary")
+  status          PaymentStatus @default(Unpaid) // New status field with default "Unpaid"
+  
+  employee        Employee @relation(fields: [employeeId], references: [id])
+  dailySummary    DailySummary  @relation(fields: [dailySummaryId], references: [id], name: "dailySummary")
 
   @@unique([employeeId, date]) // Ensure one record per employee per day
 }
@@ -121,4 +122,9 @@ enum TimesheetType {
   TIME_IN
   TIME_OUT
   BREAK
+}
+
+enum PaymentStatus {
+  Paid
+  Unpaid
 }

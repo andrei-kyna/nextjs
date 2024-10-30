@@ -54,7 +54,7 @@ const buttonStyles = {
   position: 'absolute',
   top: '60px', // Position it 20px from the top
   right: '20px', // Position it 20px from the right side
-  backgroundColor: '#28A745',
+  backgroundColor: '#1F2937',
   color: '#fff',
   padding: '10px 15px',
   borderRadius: '5px',
@@ -199,7 +199,7 @@ export default function EditInquiry() {
                     </div>
                     
                     {/* Submit Button */}
-                    <Button className="w-full bg-green-600 hover:bg-green-500 rounded" type="submit" disabled={formik.isSubmitting}>Update Inquiry</Button>
+                    <Button className="w-full bg-gray-800 hover:bg-gray-700 rounded" type="submit" disabled={formik.isSubmitting}>Update Inquiry</Button>
                     {formStatus && <p className="text-center">{formStatus}</p>}
                 </form>
             </div>

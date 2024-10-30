@@ -122,7 +122,7 @@ export default function Login() {
           )}
         </div>
 
-        <Button className="w-full bg-green-600 hover:bg-green-500 rounded p-2" type="submit" disabled={formik.isSubmitting}>Login</Button>
+        <Button className="w-full bg-gray-800 hover:bg-gray-700 rounded p-2" type="submit" disabled={formik.isSubmitting}>Login</Button>
         
         {formStatus && <p className='text-center'>{formStatus}</p>}
       </form>

@@ -113,7 +113,7 @@ const backButtonStyles = {
   position: 'absolute',
   top: '60px', // Position it 20px from the top
   right: '20px', // Position it 20px from the right side
-  backgroundColor: '#28A745',
+  backgroundColor: '#1F2937',
   color: '#fff',
   padding: '10px 15px',
   borderRadius: '5px',

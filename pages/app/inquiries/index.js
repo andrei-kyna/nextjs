@@ -27,7 +27,7 @@ export default function Inquiries() {
       setError(err.message);  
     } 
     finally {
-      setLoading(false);  
+      setTimeout(() => setLoading(false), 1000);
     }
   };
 
@@ -144,7 +144,7 @@ const tableStyles = {
 };
 
 const buttonStyles = {
-  backgroundColor: '#28A745',
+  backgroundColor: '#1F2937',
   color: '#fff',
   padding: '10px 20px',
   borderRadius: '5px',

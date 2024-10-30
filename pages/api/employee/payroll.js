@@ -9,7 +9,6 @@ export default async function handler(req, res) {
   try {
     // Validate data
     const validatedData = await employeePayrateFormSchema.validate(req.body);
-
     const { payRate, payRateSchedule, effectiveDate } = validatedData;
 
     // Get the current user and employeeId.
@@ -18,8 +17,28 @@ export default async function handler(req, res) {
     const employee = await prisma.employee.findUnique({
       where: { employeeNo },
     });
-    const employeeId = employee.id;
 
+    if (!employee) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    // send the data to PayRate table in database with only 1 record.
+    const employeeId = employee.id;
+    await prisma.payRate.upsert({
+      where: { employeeId },
+      update: {
+        payRate,
+        payRateSchedule,
+        effectiveDate: effectiveDate,
+        updatedAt: new Date(),
+      },
+      create: {
+        employeeId,
+        payRate,
+        payRateSchedule,
+        effectiveDate: effectiveDate,
+      },
+    });
 
     // Fetch all daily summaries of this employee where date is the effectiveDate
     const dailySummaries = await prisma.dailySummary.findMany({
@@ -35,10 +54,10 @@ export default async function handler(req, res) {
     const paymentRecords = [];
 
     for (const summary of dailySummaries) {
-      // Get the totalTime in hours.
+      // Get the totalTime in hours
       const totalHours = Math.floor(summary.totalTime / 3600); 
 
-      // Determine the rate.
+      // Determine the rate
       let payAmount = 0;
 
       if (payRateSchedule === 'Hourly') {

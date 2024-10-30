@@ -215,7 +215,7 @@ onSubmit: async (values) => {
         <Button
           variant="default"
           type="button"
-          className="min-w-28 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
+          className="min-w-28 bg-gray-800 hover:bg-gray-700 rounded text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
           onClick={async () => {
             setIsTimeInLoading(true);
             await formik.setFieldValue('action', 'TIME_IN');
@@ -230,7 +230,7 @@ onSubmit: async (values) => {
         <Button
           variant="default"
           type="button"
-          className="min-w-28 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
+          className="min-w-28 bg-gray-800 hover:bg-gray-700 rounded text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
           onClick={async () => {
             setIsBreakLoading(true);
             await formik.setFieldValue('action', 'BREAK');
@@ -245,7 +245,7 @@ onSubmit: async (values) => {
         <Button
           variant="default"
           type="button"
-          className="min-w-28 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
+          className="min-w-28 bg-gray-800 hover:bg-gray-700 rounded text-white rounded-lg shadow-md transform transition-transform hover:scale-105"
           onClick={async () => {
             setIsTimeOutLoading(true);
             await formik.setFieldValue('action', 'TIME_OUT');
